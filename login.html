@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Login - CAITS</title>
+<style>
+body{
+    margin:0;
+    font-family:'Segoe UI', sans-serif;
+    background: linear-gradient(120deg,#89f7fe,#66a6ff);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    height:100vh;
+    overflow:hidden;
+}
+.circle{position:absolute;border-radius:50%;opacity:0.3;animation: float 8s infinite linear;}
+.circle1{width:200px;height:200px;background:#ff9a9e;top:50px;left:-50px;}
+.circle2{width:150px;height:150px;background:#fad0c4;bottom:50px;right:-50px;}
+@keyframes float{0%{transform:translateY(0)}50%{transform:translateY(-30px)}100%{transform:translateY(0)}}
+.card{background: rgba(255,255,255,0.25);backdrop-filter: blur(15px);padding:40px;border-radius:20px;width:330px;text-align:center;box-shadow:0 10px 30px rgba(0,0,0,0.2);animation: fadeIn 1s ease;}
+@keyframes fadeIn{from{opacity:0; transform:translateY(20px);}to{opacity:1;}}
+.icon{font-size:45px;margin-bottom:10px;}
+h2{margin-bottom:5px;color:#222;}
+p{font-size:14px;color:#333;}
+.input-group{position:relative;}
+input{width:100%;padding:12px;border-radius:10px;border:none;margin-top:15px;font-size:15px;outline:none;}
+.eye{position:absolute;right:10px;top:28px;cursor:pointer;}
+button{margin-top:20px;width:100%;padding:12px;border:none;border-radius:10px;background:#0077ff;color:white;font-size:16px;cursor:pointer;transition:0.3s;}
+button:hover{background:#0056c1;transform:scale(1.05);}
+.loader{display:none;margin-top:20px;font-weight:bold;color:#0056b3;}
+.footer-text{margin-top:15px;font-size:12px;}
+.error{color:red;margin-top:10px;font-size:14px;}
+</style>
+</head>
+<body>
+
+<div class="circle circle1"></div>
+<div class="circle circle2"></div>
+
+<div class="card">
+<div class="icon">🔐</div>
+<h2>Welcome to CAITS</h2>
+<p>Login to continue</p>
+
+<form method="POST" onsubmit="showLoader()">
+<input type="text" name="username" placeholder="Enter your name" required>
+<div class="input-group">
+<input type="password" id="password" name="password" placeholder="Enter password" required>
+<span class="eye" onclick="togglePassword()">👁️</span>
+</div>
+<button type="submit">Login</button>
+</form>
+
+<div class="loader" id="loader">⏳ Logging in...</div>
+
+{% if error %}
+<p class="error">{{ error }}</p>
+{% endif %}
+
+<div class="footer-text">Context-Aware Idiom Translation System</div>
+</div>
+
+<script>
+function togglePassword(){
+    let pass = document.getElementById("password");
+    pass.type = pass.type === "password" ? "text" : "password";
+}
+function showLoader(){
+    document.getElementById("loader").style.display = "block";
+    document.querySelector("button").disabled = true;
+}
+</script>
+
+</body>
+</html>

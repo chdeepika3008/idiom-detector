@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>About</title>
+
+<style>
+/* BODY & BACKGROUND */
+body {
+    background: linear-gradient(120deg, #0f1f3d, #1a2b4c);
+    color: white;
+    font-family: 'Segoe UI', sans-serif;
+    margin: 0;
+}
+
+/* NAVBAR */
+nav{
+    background: rgba(255,255,255,0.85); /* slightly transparent white */
+    padding:15px;
+    text-align:center;
+    box-shadow:0 2px 10px rgba(0,0,0,0.1);
+}
+nav a{
+    margin:10px;
+    color:#333;
+    font-weight:bold;
+    text-decoration:none;
+    font-size:16px;
+}
+nav a:hover{
+    color:#0077ff;
+}
+
+/* CONTAINER */
+.container{
+    text-align:center;
+    margin-top:80px;
+    z-index:1;
+}
+
+/* CARD */
+.card{
+    background: rgba(255,255,255,0.95); /* slightly transparent white */
+    color: #222; /* readable text inside card */
+    padding:30px;
+    border-radius:15px;
+    width:500px;
+    margin:auto;
+    box-shadow:0 10px 25px rgba(0,0,0,0.25);
+    transition:0.3s;
+}
+.card:hover{
+    transform: translateY(-5px);
+}
+</style>
+</head>
+
+<body>
+
+<nav>
+<a href="/">🏠 Home</a>
+<a href="/translate">🔍 Translate</a>
+<a href="/examples">📘 Examples</a>
+<a href="/library">📚 Library</a>
+<a href="/history">📜 History</a>
+<a href="/about">ℹ About</a>
+<a href="/help">❓ Help</a>
+{% if session.user %}
+    <a href="/logout">🚪 Logout</a>
+{% else %}
+    <a href="/login">🔑 Login</a>
+{% endif %}
+</nav>
+
+<div class="container">
+<h1>ℹ About CAITS</h1>
+
+<div class="card">
+<p>CAITS is a <b>Context-Aware Idiom Translation System</b> that understands real meanings of idioms instead of literal translations.</p>
+<p>It helps users learn, translate, and explore idioms in English with accurate Telugu interpretations using intelligent context analysis.</p>
+</div>
+
+</div>
+
+<script>
+function confirmLogout(){
+    let confirmBox = confirm("Are you sure you want to logout?");
+    if(confirmBox){
+        window.location.href = "/logout";
+    }
+}
+</script>
+
+</body>
+</html>

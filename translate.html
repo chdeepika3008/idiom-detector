@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Translate</title>
+
+<style>
+body{
+    background: linear-gradient(120deg, #0f1f3d, #1a2b4c);
+    color: white;
+    font-family: 'Segoe UI', sans-serif;
+    margin: 0;
+}
+
+/* NAVBAR */
+nav{
+    background: rgba(255,255,255,0.85); /* slightly transparent white */
+    padding:15px;
+    text-align:center;
+    box-shadow:0 2px 10px rgba(0,0,0,0.1);
+}
+nav a{
+    margin:10px;
+    color:#333; /* text visible on white navbar */
+    font-weight:bold;
+    text-decoration:none;
+    font-size:16px;
+}
+nav a:hover{
+    color:#0077ff;
+}
+
+/* CONTAINER */
+.container{
+    text-align:center;
+    margin-top:40px;
+    position: relative;
+    z-index:1; /* above background */
+}
+
+/* CARDS */
+.card{
+    background: rgba(255,255,255,0.95); /* slightly transparent */
+    color: #222; /* readable on white card */
+    width:420px;
+    margin:20px auto;
+    padding:20px;
+    border-radius:15px;
+    box-shadow:0 10px 25px rgba(0,0,0,0.25);
+    text-align:left;
+}
+.card h3{
+    color:#0077ff;
+}
+
+/* FORM */
+form{
+    margin-bottom:20px;
+}
+input[type="text"]{
+    padding:10px;
+    width:300px;
+    border-radius:5px;
+    border:1px solid #ccc;
+}
+button{
+    padding:10px 15px;
+    border:none;
+    border-radius:5px;
+    background-color:#0077ff;
+    color:white;
+    cursor:pointer;
+    font-weight:bold;
+    margin-left:5px;
+}
+button:hover{
+    background-color:#0056b3;
+}
+
+/* IDIOM POPUP */
+#idiomPopup {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    background-color: #ff9800; /* stands out on dark blue */
+    color: black;
+    padding: 10px 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    font-weight: bold;
+    z-index: 9999;
+    opacity: 0;
+    transition: opacity 0.5s ease, transform 0.5s ease;
+}
+</style>
+</head>
+
+<body>
+
+<!-- IDIOM POPUP -->
+<div id="idiomPopup" style="display:none;"></div>
+
+<nav>
+<a href="/">🏠 Home</a>
+{% if session.user %}
+    <a href="/translate">🔍 Translate</a>
+    <a href="/examples">📘 Examples</a>
+    <a href="/library">📚 Library</a>
+    <a href="/history">📜 History</a>
+    <a href="/about">ℹ About</a>
+    <a href="/help">❓ Help</a>
+    <a href="/logout">🚪 Logout</a>
+{% else %}
+    <a href="/login">🔑 Login</a>
+    <a href="/register">📝 Register</a>
+{% endif %}
+</nav>
+
+<div class="container">
+
+<h1>🔍 Translate Your Idiom</h1>
+
+<form id="translateForm" method="POST">
+<input type="text" id="sentence" name="sentence" placeholder="Type or speak your idiom..." required>
+<button type="button" id="micBtn">🎤</button>
+<button type="submit">Translate</button>
+</form>
+
+{% if idiom %}
+<div class="card">
+    <h3>{{ idiom }}</h3>
+    <p><b>Sentence:</b> {{ sentence }}</p>
+    <p><b>Meaning:</b> {{ meaning }}</p>
+    <p><b>Telugu:</b> {{ telugu }}</p>
+</div>
+{% endif %}
+
+</div>
+
+<script>
+// VOICE INPUT
+const micBtn = document.getElementById("micBtn");
+const sentenceInput = document.getElementById("sentence");
+const translateForm = document.getElementById("translateForm");
+
+if ('webkitSpeechRecognition' in window) {
+    const recognition = new webkitSpeechRecognition();
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    recognition.lang = "en-US";
+
+    micBtn.addEventListener("click", () => {
+        recognition.start();
+        micBtn.textContent = "🎙️ Listening...";
+    });
+
+    recognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        sentenceInput.value = transcript;
+        micBtn.textContent = "🎤";
+        translateForm.submit();
+    };
+
+    recognition.onerror = (event) => {
+        console.error("Voice input error:", event.error);
+        micBtn.textContent = "🎤";
+    };
+
+    recognition.onend = () => {
+        micBtn.textContent = "🎤";
+    };
+}
+
+// IDIOM POPUP
+function showIdiomPopup(message){
+    if(!message) return;
+    const popup = document.getElementById("idiomPopup");
+    popup.textContent = "📌 Idiom of the Day: " + message;
+    popup.style.display = "block";
+    popup.style.opacity = 1;
+    popup.style.transform = "translateX(0)";
+    setTimeout(() => {
+        popup.style.opacity = 0;
+        popup.style.transform = "translateX(-100%)";
+        setTimeout(()=>{ popup.style.display = "none"; }, 500);
+    }, 6000); // 6 seconds
+}
+
+// Show Idiom of the Day once per login session
+window.addEventListener('DOMContentLoaded', () => {
+    {% if idiom_of_the_day %}
+        showIdiomPopup("{{ idiom_of_the_day }}");
+    {% endif %}
+});
+</script>
+
+</body>
+</html>

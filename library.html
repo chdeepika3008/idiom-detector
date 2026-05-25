@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Interactive Library</title>
+<style>
+body {
+    margin: 0;
+    font-family: 'Segoe UI', sans-serif;
+    background: linear-gradient(120deg, #0f1f3d, #1a2b4c);
+    color: white;
+}
+
+/* Navigation */
+nav {
+    background: white;
+    padding: 15px;
+    text-align: center;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+nav a {
+    margin: 10px;
+    color: #333;
+    font-weight: bold;
+    text-decoration: none;
+}
+nav a:hover { color: #0077ff; }
+
+/* Library heading */
+.library-heading {
+    text-align: center;
+    font-size: 32px;
+    margin: 20px 0;
+}
+
+/* Container */
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 50px;
+    perspective: 1200px;
+}
+
+/* Bookshelf background */
+.library-wrapper {
+    position: relative;
+    width: 500px;
+    height: 400px;
+    background: url('../static/images/bookshelf.jpg') no-repeat center center;
+    background-size: cover;
+    border: none; /* remove any border */
+}
+
+/* Clickable books as transparent divs */
+.book {
+    position: absolute;
+    width: 50px;
+    height: 70px;
+    cursor: pointer;
+    /* fully transparent so lines/grid are invisible */
+    background: rgba(255,255,255,0);
+    border: none;
+    z-index: 10;
+    transition: transform 0.2s;
+}
+.book:hover {
+    transform: scale(1.2);
+}
+
+/* Idiom card */
+#idiom-card {
+    width: 450px;
+    min-height: 350px;
+    padding: 40px 30px;
+    border-radius: 15px;
+    background: url('../static/images/open_book.png') no-repeat center center;
+    background-size: cover;
+    color: #222;
+    font-weight: bold;
+    text-align: left;
+    transform-style: preserve-3d;
+    transform-origin: left center;
+    transform: rotateY(-180deg);
+    opacity: 0;
+    transition: transform 0.8s ease, opacity 0.8s ease;
+}
+#idiom-card.show {
+    transform: rotateY(0deg);
+    opacity: 1;
+}
+#idiom-card h3, #idiom-card p { margin: 10px 0; }
+</style>
+</head>
+<body>
+
+<nav>
+<a href="/">🏠 Home</a>
+<a href="/translate">🔍 Translate</a>
+<a href="/examples">📘 Examples</a>
+<a href="/library">📚 Library</a>
+<a href="/history">📜 History</a>
+<a href="/about">ℹ About</a>
+<a href="/help">❓ Help</a>
+</nav>
+
+<div class="library-heading">📚 Interactive Library</div>
+
+<div class="container">
+    <!-- Bookshelf -->
+    <div class="library-wrapper" id="library-wrapper"></div>
+
+    <!-- Idiom card -->
+    <div class="card" id="idiom-card">
+        <h3 id="idiom-title"></h3>
+        <p><b>Sentence:</b> <span id="idiom-sentence"></span></p>
+        <p><b>Meaning:</b> <span id="idiom-meaning"></span></p>
+        <p><b>Telugu:</b> <span id="idiom-telugu"></span></p>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const idioms = [
+        {idiom:"Spill the beans", sentence:"During the meeting, Ravi accidentally spilled the beans about the surprise party.", meaning:"reveal a secret", telugu:"సమావేశంలో, రవి అనుకోకుండా రహస్యం బయట పెట్టాడు సర్‌ప్రైజ్ పార్టీ గురించి."},
+        {idiom:"Break the ice", sentence:"To break the ice, she told a funny story at the start of the meeting.", meaning:"initiate conversation in a social setting", telugu:"సమావేశం ప్రారంభంలో, ఆమె ఒక హాస్యకథ చెప్పి వాతావరణాన్ని స్నిగ్ధంగా చేసింది."},
+        {idiom:"Hit the sack", sentence:"After a long day at work, I’m ready to hit the sack.", meaning:"go to bed / sleep", telugu:"ఉద్యోగం తర్వాత, నేను ఇప్పుడు కుర్చీకి వెళ్ళి నిద్రించాలి."},
+        {idiom:"Piece of cake", sentence:"The test was a piece of cake for her.", meaning:"something very easy", telugu:"పరీక్ష ఆమెకు చాలా సులభం గా ఉంది."},
+        {idiom:"Let the cat out of the bag", sentence:"He accidentally let the cat out of the bag about the promotion.", meaning:"reveal a secret by mistake", telugu:"అతను అనుకోకుండా ప్రమోషన్ గురించి రహస్యం బయట పెట్టాడు."},
+        {idiom:"Bite the bullet", sentence:"She decided to bite the bullet and tell her boss the truth.", meaning:"face a difficult situation bravely", telugu:"ఆమె ధైర్యంగా సమస్యను ఎదుర్కొని నిజం చెప్పింది."},
+        {idiom:"Under the weather", sentence:"I’m feeling under the weather today, so I’ll stay home.", meaning:"feeling sick", telugu:"నేను ఈ రోజు అనారోగ్యంగా ఉన్నాను, కాబట్టి ఇల్లు ఉంటాను."},
+        {idiom:"Cut corners", sentence:"They cut corners to finish the project on time.", meaning:"do something in the easiest/quickest way, often poorly", telugu:"వారు ప్రాజెక్ట్ సమయానికి పూర్తి చేయడానికి తప్పులు చేసారు."},
+        {idiom:"Cost an arm and a leg", sentence:"The new smartphone cost an arm and a leg.", meaning:"very expensive", telugu:"కొత్త స్మార్ట్‌ఫోన్ చాలా ఖరీదైనది."},
+        {idiom:"Burn the midnight oil", sentence:"She had to burn the midnight oil to finish her thesis.", meaning:"work late into the night", telugu:"ఆమె తన థీసిస్ పూర్తి చేసుకోవడానికి రాత్రంతా పనిచేసింది."}
+    ];
+
+    const wrapper = document.getElementById('library-wrapper');
+    const card = document.getElementById('idiom-card');
+
+    const bookWidth = 50;
+    const bookHeight = 70;
+    const padding = 20;
+    let x = 20;
+    let y = 50;
+    const rowLimit = 430;
+
+    idioms.forEach(item => {
+        // create transparent clickable div for book
+        const bookDiv = document.createElement('div');
+        bookDiv.classList.add('book');
+        bookDiv.style.left = x + 'px';
+        bookDiv.style.top = y + 'px';
+        wrapper.appendChild(bookDiv);
+
+        x += bookWidth + padding;
+        if(x > rowLimit){ x = 20; y += bookHeight + padding; }
+
+        bookDiv.addEventListener('click', () => {
+            document.getElementById("idiom-title").innerText = item.idiom;
+            document.getElementById("idiom-sentence").innerText = item.sentence;
+            document.getElementById("idiom-meaning").innerText = item.meaning;
+            document.getElementById("idiom-telugu").innerText = item.telugu;
+
+            card.classList.remove('show');
+            setTimeout(()=> card.classList.add('show'), 50);
+        });
+    });
+});
+</script>
+</body>
+</html>
