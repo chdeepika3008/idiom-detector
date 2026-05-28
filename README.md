@@ -57,10 +57,6 @@ The Context Aware Idiom Translation System (CAITS) is a web-based application de
 3. Run the application:
 
    python main.py
-   
-4. Open browser and go to:
-
-   http://127.0.0.1:5000/
  
 
 ## Project Structure
